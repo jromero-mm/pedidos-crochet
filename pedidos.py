@@ -20,6 +20,8 @@ def crear_base_datos():
             creado_en TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    conexion.commit()
+    conexion.close()
 def insertar_pedido(
     cliente,
     telefono,
@@ -60,6 +62,41 @@ def insertar_pedido(
     conexion.close()
 
     return pedido_id   
+def obtener_pedidos():
+    conexion = sqlite3.connect(RUTA_BD)
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            cliente,
+            producto,
+            precio_total,
+            adelanto,
+            precio_total - adelanto AS saldo,
+            fecha_entrega,
+            estado
+        FROM pedidos
+        ORDER BY id DESC
+    """)
+
+    pedidos = cursor.fetchall()
+
+    conexion.close()
+
+    return pedidos
+def actualizar_estado(pedido_id, estado):
+    conexion = sqlite3.connect(RUTA_BD)
+    cursor = conexion.cursor()
+
+    cursor.execute(
+        """
+        UPDATE pedidos
+        SET estado = ?
+        WHERE id = ?
+        """,
+        (estado, pedido_id)
+    )
+
     conexion.commit()
     conexion.close()
-    
