@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from pedidos import (crear_base_datos, insertar_pedido, obtener_pedidos, actualizar_estado)
+from pedidos import (crear_base_datos, insertar_pedido, obtener_pedidos,obtener_pedido, actualizar_estado, eliminar_pedido, actualizar_pedido)
 from tkcalendar import DateEntry, Calendar
 from datetime import datetime
 
@@ -78,6 +78,52 @@ def mostrar_pedidos():
         )
 
         mostrar_pedidos()
+    def eliminar_seleccionado():
+        seleccion = tabla.selection()
+
+        if not seleccion:
+            messagebox.showwarning(
+                "Sin selección",
+                "Selecciona un pedido para eliminar."
+            )
+            return
+
+        valores = tabla.item(seleccion[0], "values")
+        pedido_id = valores[0]
+
+        confirmar = messagebox.askyesno(
+            "Confirmar eliminación",
+            f"¿Seguro que deseas eliminar el pedido #{pedido_id}?"
+        )
+
+        if not confirmar:
+            return
+
+        eliminar_pedido(pedido_id)
+
+        messagebox.showinfo(
+            "Pedido eliminado",
+            "El pedido se eliminó correctamente."
+        )
+
+        mostrar_pedidos()
+    def editar_seleccionado():
+        seleccion = tabla.selection()
+
+        if not seleccion:
+            messagebox.showwarning(
+                "Sin selección",
+                "Selecciona un pedido para editar."
+            )
+            return
+
+        valores = tabla.item(seleccion[0], "values")
+        pedido_id = valores[0]
+
+        pedido = obtener_pedido(pedido_id)
+
+        if pedido is not None:
+            mostrar_nuevos_pedidos(pedido)
 
     marco_estado = ttk.Frame(cuerpo)
     marco_estado.pack(pady=15)
@@ -103,7 +149,19 @@ def mostrar_pedidos():
         width=15
     )
     selector_estado.pack(side="left", padx=5)
+    boton_editar = ttk.Button(
+        marco_estado,
+        text="Editar pedido",
+        command=editar_seleccionado
+    )
+    boton_editar.pack(side="left", padx=5)
 
+    boton_eliminar = ttk.Button(
+        marco_estado,
+        text="Eliminar pedido",
+        command=eliminar_seleccionado
+    )
+    boton_eliminar.pack(side="left", padx=5)
     boton_actualizar = ttk.Button(
         marco_estado,
         text="Actualizar estado",
@@ -120,9 +178,17 @@ def mostrar_calendario():
     calendario = Calendar(
         cuerpo,
         selectmode="day",
-        date_pattern="yyyy-mm-dd"
+        date_pattern="yyyy-mm-dd",
+        font=("Arial", 12),
+        headersfont=("Arial", 14, "bold"),
+        selectfont=("Arial", 16, "bold")
+        
     )
-    calendario.pack(pady=40)
+    calendario.pack(
+        pady=15,
+        padx=15
+    )
+    
 
     for pedido in pedidos:
         fecha_texto = pedido[6]
@@ -186,7 +252,7 @@ def mostrar_calendario():
         mostrar_pedidos_del_dia
     )
 
-def mostrar_nuevos_pedidos():
+def mostrar_nuevos_pedidos(pedido=None):
     titulo.config(text="NUEVO PEDIDO")
     limpiar_cuerpo()
     def guardar_pedido():
@@ -228,14 +294,32 @@ def mostrar_nuevos_pedidos():
             return
 
         saldo = precio_total - adelanto
-        pedido_id = insertar_pedido(
-            cliente,
-            telefono,
-            producto,
-            precio_total,
-            adelanto,
-            fecha_entrega
-        )
+
+        if pedido is None:
+            pedido_id = insertar_pedido(
+                cliente,
+                telefono,
+                producto,
+                precio_total,
+                adelanto,
+                fecha_entrega
+            )
+            titulo_mensaje = "Pedido guardado"
+        else:
+            pedido_id = pedido[0]
+
+            actualizar_pedido(
+                pedido_id,
+                cliente,
+                telefono,
+                producto,
+                precio_total,
+                adelanto,
+                fecha_entrega
+            )
+
+            titulo_mensaje = "Pedido actualizado"
+      
         print("Cliente:", cliente)
         print("Teléfono:", telefono)
         print("Producto:", producto)
@@ -245,8 +329,8 @@ def mostrar_nuevos_pedidos():
         print("Saldo pendiente:", saldo)
 
         messagebox.showinfo(
-            "Pedido guardado",
-            f"Pedido #{pedido_id} guardado correctamente.\n"
+            titulo_mensaje,
+            f"Pedido #{pedido_id} actualizado correctamente.\n"
             f"Saldo pendiente: S/ {saldo:.2f}"
         )
         mostrar_nuevos_pedidos()    
@@ -336,6 +420,22 @@ def mostrar_nuevos_pedidos():
         padx=10,
         pady=10
     )
+    if pedido is not None:
+        entrada_cliente.insert(0, pedido[1])
+        entrada_telefono.insert(0, pedido[2])
+        entrada_producto.insert(0, pedido[3])
+        entrada_precio_total.insert(0, str(pedido[4]))
+        entrada_adelanto.insert(0, str(pedido[5]))
+
+        try:
+            fecha = datetime.strptime(
+                pedido[6],
+                "%Y-%m-%d"
+            ).date()
+
+            entrada_fecha_entrega.set_date(fecha)
+        except ValueError:
+            pass
     boton_guardar = ttk.Button(
             cuerpo,
             text="Guardar Pedido",
@@ -349,7 +449,7 @@ def mostrar_nuevos_pedidos():
         )          
                 
             
-    crear_base_datos()
+crear_base_datos()
 ventana = tk.Tk()
 ventana.title("Gestión de pedidos de crochet")
 ventana.geometry("900x600")

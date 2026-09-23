@@ -100,3 +100,80 @@ def actualizar_estado(pedido_id, estado):
 
     conexion.commit()
     conexion.close()
+def actualizar_pedido(
+    pedido_id,
+    cliente,
+    telefono,
+    producto,
+    precio_total,
+    adelanto,
+    fecha_entrega
+):
+    conexion = sqlite3.connect(RUTA_BD)
+    cursor = conexion.cursor()
+
+    cursor.execute(
+        """
+        UPDATE pedidos
+        SET
+            cliente = ?,
+            telefono = ?,
+            producto = ?,
+            precio_total = ?,
+            adelanto = ?,
+            fecha_entrega = ?
+        WHERE id = ?
+        """,    
+        
+        (
+            cliente,
+            telefono,
+            producto,
+            precio_total,
+            adelanto,
+            fecha_entrega,
+            pedido_id
+        )
+    )
+    conexion.commit()
+    conexion.close()        
+def obtener_pedido(pedido_id):
+    conexion = sqlite3.connect(RUTA_BD)
+    cursor = conexion.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            id,
+            cliente,
+            telefono,
+            producto,
+            precio_total,
+            adelanto,
+            fecha_entrega,
+            estado
+        FROM pedidos
+        WHERE id = ?
+        """,
+        (pedido_id,)
+    )
+
+    pedido = cursor.fetchone()
+
+    conexion.close()
+
+    return pedido
+def eliminar_pedido(pedido_id):
+    conexion = sqlite3.connect(RUTA_BD)
+    cursor = conexion.cursor()
+
+    cursor.execute(
+        """
+        DELETE FROM pedidos
+        WHERE id = ?
+        """,
+        (pedido_id,)
+    )
+
+    conexion.commit()
+    conexion.close()
