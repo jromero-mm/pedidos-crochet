@@ -1,7 +1,40 @@
+import os
 import sqlite3
+import sys
 from pathlib import Path
 
-RUTA_BD = Path(__file__).resolve().parent / "pedidos.db"
+
+def _directorio_datos():
+    """Devuelve una carpeta estable para guardar la base de datos.
+
+    Al ejecutar desde Python se mantiene la carpeta del proyecto. Al ejecutar
+    desde un .exe generado con PyInstaller se usa la carpeta que contiene al
+    ejecutable, para que los pedidos se guarden localmente y sobrevivan al
+    cerrar y abrir nuevamente el programa.
+    """
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+
+    return Path(__file__).resolve().parent
+
+
+DIRECTORIO_DATOS = _directorio_datos()
+
+try:
+    DIRECTORIO_DATOS.mkdir(parents=True, exist_ok=True)
+except OSError:
+    # Si el ejecutable está en una carpeta de solo lectura, usamos una
+    # ubicación local del usuario en Windows.
+    if os.name == "nt":
+        DIRECTORIO_DATOS = (
+            Path(os.environ.get("APPDATA", str(Path.home())))
+            / "Melicrochet"
+        )
+    else:
+        DIRECTORIO_DATOS = Path.home() / ".melicrochet"
+    DIRECTORIO_DATOS.mkdir(parents=True, exist_ok=True)
+
+RUTA_BD = DIRECTORIO_DATOS / "pedidos.db"
 
 def crear_base_datos():
     conexion = sqlite3.connect(RUTA_BD)
