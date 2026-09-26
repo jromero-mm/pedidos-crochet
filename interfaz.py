@@ -17,29 +17,31 @@ from pedidos import (
 )
 
 
-# Paleta pastel: rosa, lavanda, melocotón y menta.
+# Paleta cálida pastel: rosa, durazno, melocotón y crema.
+# Los cuatro códigos principales son los solicitados; los tonos derivados
+# oscuros se usan únicamente para mantener legible el texto y los botones.
 COLORES = {
-    "fondo": "#FFF7FB",
-    "superficie": "#FFFFFF",
-    "superficie_suave": "#FFF9FC",
-    "sidebar": "#704A6E",
-    "sidebar_hover": "#80577E",
-    "sidebar_activo": "#D98BB0",
-    "rosa": "#C85F91",
-    "rosa_oscuro": "#A84A77",
-    "rosa_suave": "#F8E3EE",
-    "lavanda": "#EEE7F6",
-    "lavanda_oscuro": "#76608C",
-    "menta": "#E3F4EE",
-    "menta_oscuro": "#477A68",
-    "melocoton": "#FFF0E5",
-    "melocoton_oscuro": "#A7653C",
+    "fondo": "#FFFAD3",
+    "superficie": "#FFFDF2",
+    "superficie_suave": "#FFF3D8",
+    "sidebar": "#C97373",
+    "sidebar_hover": "#B96565",
+    "sidebar_activo": "#FFB1B1",
+    "rosa": "#D97373",
+    "rosa_oscuro": "#A95151",
+    "rosa_suave": "#FFCCB8",
+    "lavanda": "#FFDBB0",
+    "lavanda_oscuro": "#8E5A34",
+    "menta": "#FFFAD3",
+    "menta_oscuro": "#8B6A2E",
+    "melocoton": "#FFCCB8",
+    "melocoton_oscuro": "#9B5C43",
     "texto": "#4A3448",
-    "texto_suave": "#927D91",
-    "borde": "#F0DCE8",
-    "borde_fuerte": "#E4C9DA",
-    "encabezado": "#F8EFF5",
-    "peligro": "#C65D72",
+    "texto_suave": "#8B6B64",
+    "borde": "#F0C9AE",
+    "borde_fuerte": "#E4AE93",
+    "encabezado": "#FFF0D6",
+    "peligro": "#C85B5B",
     "blanco": "#FFFFFF",
 }
 
